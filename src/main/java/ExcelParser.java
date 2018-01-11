@@ -4,12 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class ExcelParser {
-    private List<List<String>> sheetData = new ArrayList<List<String>>();
     private String filename;
     private Workbook workbook = null;
+    private Iterator<Row> workbookItr = null;
 
     public ExcelParser(String file) {
         filename = file;
@@ -38,21 +39,41 @@ public class ExcelParser {
         return GetSheetData(1000);
     }
 
-    public List<List<String>> GetSheetData(int limit) {
-        int index = 0;
-        for(Sheet sheet : workbook) {
-            for (Row r : sheet) {
-                if (index > limit)
-                    return sheetData;
+    public List<List<String>> GetAllSheetData() {
+        List<List<String>> sheetData = new ArrayList<List<String>>();
+        Sheet sheet = workbook.getSheetAt((0));
+        workbookItr = sheet.rowIterator();
 
-                List<String> rowData = new ArrayList<String>();
-                for (Cell c : r)
-                    rowData.add(c.getStringCellValue());
+        while(workbookItr.hasNext()) {
+            List<String> rowData = new ArrayList<String>();
+            for (Cell c : workbookItr.next())
+                rowData.add(c.getStringCellValue());
 
-                sheetData.add(rowData);
-                index++;
-            }
+            sheetData.add(rowData);
+
         }
+        return sheetData;
+    }
+
+    public List<List<String>> GetSheetData(int limit) {
+        List<List<String>> sheetData = new ArrayList<List<String>>();
+        if (workbookItr == null) {
+            Sheet sheet = workbook.getSheetAt((0));
+            workbookItr = sheet.rowIterator();
+        }
+
+        for (int index = 0; workbookItr.hasNext(); index++) {
+            if (index > limit)
+                return sheetData;
+
+            List<String> rowData = new ArrayList<String>();
+            for (Cell c : workbookItr.next())
+                rowData.add(c.getStringCellValue());
+
+            sheetData.add(rowData);
+
+        }
+
         return sheetData;
     }
 
@@ -67,7 +88,7 @@ public class ExcelParser {
             return;
         }
 
-        List<List<String>> data = parser.GetSheetData();
+        List<List<String>> data = parser.GetAllSheetData();
         final long endTime = System.currentTimeMillis();
         System.out.println("Parsed: " + data.size() + " rows in: " + (endTime - startTime) + "ms.");
         System.out.println(data.get(1));
