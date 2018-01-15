@@ -13,5 +13,19 @@
             <artifactId>xlsx-streamer</artifactId>
             <version>1.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.jopendocument</groupId>
+            <artifactId>jOpenDocument</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>..</artifactId>
+            <groupId>..</groupId>
+            <scope>system</scope>
+            <systemPath>${basedir}/SX.jar</systemPath>
+        </dependency>
     </dependencies>
+
+
 </project>
